@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Original Document{% endblock %}
+
+{% block content %}
+<div class="row min-vh-100 align-items-center justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="glass-container fade-in">
+            <div class="text-center mb-4">
+                <div class="icon-circle mb-3">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <h2 class="text-primary fw-bold">Upload Original Document</h2>
+                <p class="text-muted">Upload the original documents for verification</p>
+            </div>
+
+            <form action="{{ url_for('admin_upload') }}" method="post" enctype="multipart/form-data" class="mb-4">
+                <div class="mb-4">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-file-alt"></i>
+                        </span>
+                        <input type="file" class="form-control form-control-custom" name="file" required>
+                    </div>
+                    <small class="text-muted mt-2 d-block">Supported formats: PDF, JPG, PNG</small>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-custom btn-primary-custom">
+                        <i class="fas fa-cloud-upload-alt me-2"></i>Upload Document
+                    </button>
+                    <a href="{{ url_for('verify') }}" class="btn btn-custom btn-secondary-custom">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Verification
+                    </a>
+                </div>
+            </form>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert {% if category == 'success' %}alert-success{% else %}alert-danger{% endif %} fade-in" role="alert">
+                      <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+                      {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+</div>
+{% endblock %}

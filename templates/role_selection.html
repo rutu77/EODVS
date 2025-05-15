@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Select Role - Employee Onboarding{% endblock %}
+
+{% block content %}
+<div class="row min-vh-100 align-items-center">
+    <div class="col-12 text-center">
+        <div class="hero-section fade-in">
+            <h1 class="hero-title mb-4">Welcome to Employee Onboarding Document Verification System</h1>
+            <p class="hero-subtitle mb-5">Choose your role to proceed with document verification</p>
+            
+            <div class="row justify-content-center">
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <div class="icon-circle mb-3">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h3 class="h4 mb-3 text-dark">Employee</h3>
+                        <p class="text-muted mb-4">Submit your documents</p>
+                        <a href="{{ url_for('upload') }}" class="btn btn-custom btn-primary-custom w-100">
+                            <i class="fas fa-arrow-right me-2"></i>Continue as Employee
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <div class="icon-circle mb-3">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3 class="h4 mb-3 text-dark">HR Personnel</h3>
+                        <p class="text-muted mb-4">Manage and verify documents</p>
+                        <a href="{{ url_for('login') }}" class="btn btn-custom btn-secondary-custom w-100">
+                            <i class="fas fa-arrow-right me-2"></i>Continue as HR
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

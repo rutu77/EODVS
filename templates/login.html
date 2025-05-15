@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HR Login - Document Verification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='tailwind.min.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg,rgb(117, 188, 174),rgb(160, 204, 131),rgb(119, 173, 206));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .glass-container {
+            background: rgba(232, 246, 238, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            text-align: center;
+            margin-left: -150px;
+        }
+        .fade-in {
+            animation: fadeIn 1s;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #357abd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+        }
+        .icon-circle i {
+            color: white;
+            font-size: 24px;
+        }
+        .form-control-custom {
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        .form-control-custom:focus {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .btn-custom {
+            background: linear-gradient(120deg,rgb(83, 173, 191) 0%,rgb(76, 124, 125) 100%);
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            background: linear-gradient(120deg,rgb(83, 186, 191) 0%,rgb(76, 124, 125) 100%);
+            transform: translateY(-2px);
+        }
+        .btn-primary-custom {
+            background: linear-gradient(120deg,rgb(83, 173, 191) 0%,rgb(76, 124, 125) 100%);
+        }
+        .btn-primary-custom:hover {
+            background: linear-gradient(120deg,rgb(83, 173, 191) 0%,rgb(76, 124, 125) 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="row min-vh-100 align-items-center justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="glass-container fade-in">
+                <div class="text-center mb-4">
+                    <div class="icon-circle mb-3">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h2 class="text-primary fw-bold">HR Login</h2>
+                    <p class="text-muted">Access the document verification system</p>
+                </div>
+                
+                <form action="{{ url_for('login') }}" method="post">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control form-control-custom" name="username" placeholder="Username" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control form-control-custom" name="password" placeholder="Password" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-custom btn-primary-custom w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login
+                    </button>
+                    
+                    {% if error %}
+                    <div class="alert alert-danger mt-3" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

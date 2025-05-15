@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Original Documents - HR{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Original Documents Uploaded by HR</h2>
+
+    {% if documents %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle shadow-sm">
+                <thead class="table-primary">
+                    <tr>
+                        <th>#</th>
+                        <th>Participant Name</th>
+                        <th>Document Hash</th>
+                        <th>File Name</th>
+                        <th>Timestamp</th>
+                        <th>Download</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ doc[0] }}</td>
+                        <td>{{ doc[1] }}</td>
+                        <td>{{ doc[2] }}</td>
+                        <td>{{ doc[3] }}</td>
+                        <td>
+                            <a href="{{ url_for('download_original', participant_name=doc[0]) }}" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                            <form action="{{ url_for('delete_original', participant_name=doc[0]) }}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this document?');">
+                                <button type="submit" style="color: red;">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            No original documents found.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
