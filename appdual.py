@@ -23,6 +23,7 @@ app.secret_key = os.urandom(24)
 config = Config()
 web3 = config.get_web3()
 
+
 # Load Google API key
 load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
@@ -309,8 +310,28 @@ def upload_data():
 
     transaction['gas'] = web3.eth.estimate_gas(transaction)
     signed_txn = account.sign_transaction(transaction)
+    # tx_hash = web3.eth.send_raw_transaction(signed_txn.raw_transaction)
+    # tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+    # Start timing
+    start_time = time.time()
+
+    # Send transaction
     tx_hash = web3.eth.send_raw_transaction(signed_txn.raw_transaction)
+
+    # Wait for transaction to be mined
     tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+
+    # End timing
+    end_time = time.time()
+
+    # Calculate latency
+    latency = end_time - start_time
+    transaction_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))
+
+    # Log it
+    logger.info(f"Transaction submitted at {transaction_time}")
+    logger.info(f"Transaction latency: {latency:.2f} seconds")
+
 
     if tx_receipt.status == 1:
         # Here, pass the extracted content, file extension, and other details to store_in_db
@@ -519,7 +540,20 @@ def admin_originals():
 
     conn = sqlite3.connect('document_verification.db')
     c = conn.cursor()
-    c.execute('SELECT participant_name, document_hash, filename, timestamp FROM original_documents')
+    c.execute('''
+        SELECT o.participant_name, o.document_hash, o.filename, o.timestamp,
+               CASE 
+                   WHEN d.txn_hash IS NOT NULL AND d.txn_hash != '' THEN 'Verified'
+                   ELSE 'Not Verified'
+               END as verification_status
+        FROM original_documents o
+        LEFT JOIN (
+            SELECT document_hash, txn_hash
+            FROM documents
+            GROUP BY document_hash
+            HAVING MAX(timestamp)
+        ) d ON o.document_hash = d.document_hash
+    ''')
     rows = c.fetchall()
     conn.close()
 

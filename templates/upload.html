@@ -14,7 +14,7 @@
                         <div class="mb-3">
                             <label for="file" class="form-label">Choose File (PDF/Image)</label>
                             <input type="file" class="form-control" id="file" name="file" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <small class="text-muted">Upload a document containing participant information</small>
+                            <small class="text-muted">Upload a document containing employee information</small>
                         </div>
                         
                         <button type="submit" class="btn btn-primary w-100">Upload Document</button>
@@ -50,7 +50,7 @@ document.getElementById('uploadForm').addEventListener('submit', async function(
         progressBar.style.width = '30%';
         status.style.display = 'block';
         status.className = 'alert alert-info';
-        status.textContent = 'Extracting participant information...';
+        status.textContent = 'Extracting employee information...';
 
         const response = await fetch('/upload_data', {
             method: 'POST',

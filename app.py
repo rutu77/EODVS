@@ -7,7 +7,7 @@ import re
 from web3 import Web3
 from dotenv import load_dotenv
 import google.generativeai as genai
-from flask import Flask, request, jsonify, render_template, flash
+from flask import Flask, request, jsonify, render_template, flash, redirect, url_for
 from functools import wraps
 import logging
 from config import Config, validate_participant_name, validate_document_hash
@@ -318,6 +318,120 @@ def upload_data():
 def result():
     global dictionary
     return render_template('result.html', dictionary=dictionary, verify_result="")
+
+@app.route('/metrics')
+def metrics():
+    conn = sqlite3.connect('document_verification.db')
+    c = conn.cursor()
+    
+    # Get total uploads
+    c.execute("SELECT COUNT(*) FROM documents")
+    total_uploads = c.fetchone()[0]
+    
+    # Get successful verifications
+    c.execute("""
+        SELECT COUNT(*) FROM documents 
+        WHERE txn_hash IS NOT NULL AND txn_hash != ''
+    """)
+    successful_verifications = c.fetchone()[0]
+    
+    # Calculate success rate
+    success_rate = 0
+    if total_uploads > 0:
+        success_rate = round((successful_verifications / total_uploads) * 100, 2)
+    
+    # Get failed verifications
+    failed_verifications = total_uploads - successful_verifications
+    
+    # Get status distribution
+    c.execute("""
+        SELECT 
+            CASE 
+                WHEN txn_hash IS NULL OR txn_hash = '' THEN 'Pending Verification'
+                ELSE 'Verified'
+            END as status,
+            COUNT(*) as count
+        FROM documents
+        GROUP BY status
+    """)
+    status_distribution = dict(c.fetchall())
+    
+    # Get recent verification attempts
+    c.execute("""
+        SELECT id, participant_name, document_hash, txn_hash, timestamp
+        FROM documents
+        ORDER BY timestamp DESC
+        LIMIT 10
+    """)
+    verification_attempts = [
+        {
+            'id': row[0],
+            'participant': row[1],
+            'document_hash': row[2],
+            'txn_hash': row[3],
+            'timestamp': row[4],
+            'status': 'Verified' if row[3] else 'Pending'
+        }
+        for row in c.fetchall()
+    ]
+    
+    # Prepare data for the pie chart
+    status_labels = list(status_distribution.keys())
+    status_data = list(status_distribution.values())
+    status_colors = {
+        'Verified': '#1cc88a',
+        'Pending Verification': '#f6c23e',
+        'Failed': '#e74a3b'
+    }
+    
+    # Generate recent updates
+    recent_updates = []
+    for attempt in verification_attempts:
+        recent_updates.append({
+            'title': f"Document {attempt['id']} {attempt['status'].lower()}",
+            'time': attempt['timestamp'],
+            'description': f"Document {attempt['id']} was {attempt['status'].lower()} for {attempt['participant']}"
+        })
+    
+    conn.close()
+    
+    return render_template(
+        'metrics.html',
+        success_rate=success_rate,
+        total_uploads=total_uploads,
+        successful_verifications=successful_verifications,
+        failed_verifications=failed_verifications,
+        status_distribution=status_distribution,
+        status_labels=status_labels,
+        status_data=status_data,
+        status_colors=status_colors,
+        verification_attempts=verification_attempts,
+        recent_updates=recent_updates
+    )
+
+# Add metrics link to navigation for HR users
+@app.context_processor
+def inject_nav_links():
+    def get_nav_links():
+        links = []
+        if 'role' in session:
+            if session['role'] == 'hr':
+                links.extend([
+                    {'url': url_for('verify'), 'text': 'Verify'},
+                    {'url': url_for('admin_upload'), 'text': 'Upload Original'},
+                    {'url': url_for('admin_originals'), 'text': 'Original documents List'},
+                    {'url': url_for('metrics'), 'text': 'Metrics'},
+                    {'url': url_for('logout'), 'text': 'Logout', 'class': 'text-danger'}
+                ])
+            elif session['role'] == 'employee':
+                links.extend([
+                    {'url': url_for('upload'), 'text': 'Upload'},
+                    {'url': url_for('logout'), 'text': 'Logout'}
+                ])
+            else:
+                links.append({'url': url_for('logout'), 'text': 'Logout'})
+        return links
+    return dict(get_nav_links=get_nav_links)
 
 if __name__ == '__main__':
     app.run(debug=True)

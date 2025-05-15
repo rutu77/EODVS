@@ -12,12 +12,13 @@
                 <thead class="table-primary">
                     <tr>
                         <th>#</th>
-                        <th>Participant Name</th>
+                        <th>Employee Name</th>
                         <th>Document Hash</th>
                         <th>File Name</th>
                         <th>Timestamp</th>
+                        <th>Verification Status</th>
                         <th>Download</th>
-                        <th>Actions</th>
+                        <!-- <th>Actions</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -28,6 +29,11 @@
                         <td>{{ doc[1] }}</td>
                         <td>{{ doc[2] }}</td>
                         <td>{{ doc[3] }}</td>
+                        <td>
+                            <span class="badge {% if doc[4] == 'Verified' %}bg-success{% else %}bg-warning{% endif %}">
+                                {{ doc[4] }}
+                            </span>
+                        </td>
                         <td>
                             <a href="{{ url_for('download_original', participant_name=doc[0]) }}" class="btn btn-sm btn-outline-success">
                                 <i class="fas fa-download"></i> Download
